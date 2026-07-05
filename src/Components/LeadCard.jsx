@@ -4,7 +4,7 @@ import { HiUserGroup } from 'react-icons/hi'
 const LeadCard = () => {
   return (
     <div>
-      <div className="bg-white w-50 h-25 rounded-xl p-5 flex items-center">
+      <div className="bg-white w-50 h-25 rounded-xl p-5 shadow flex items-center">
          <HiUserGroup className="text-5xl bg-blue-400 text-white p-1  rounded m-2 " /> 
          <div className='flex flex-col m-2'>
             <h1 className='font-lg text-gray-600'>Total Leads</h1>

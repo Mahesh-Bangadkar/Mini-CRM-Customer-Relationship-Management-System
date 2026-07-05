@@ -1,13 +1,14 @@
 import React from "react";
 import Leadform from "./Leadform";
 import LeadCard from "./LeadCard";
+import Leads from "./Leads";
 import { IoMdNotifications } from "react-icons/io";
 import { FaAngleDown } from "react-icons/fa6";
 import { useState } from "react";
 const Dashboard = () => {
   const [open, setOpen] = useState(false);
   return (
-    <div className="flex w-full p-1 m-1 max-w-auto  ṃin-h-screen bg-green-400">
+    <div className="flex w-full p-1 m-1 max-w-auto  ṃin-h-screen">
       <div id="Dashboard" className="w-full bg-white rounded-xl shadow-lg p-2">
         <div className="flex justify-between items-center ">
           <div className="flex flex-col gap-1 p-2 mb-1 ">
@@ -65,7 +66,7 @@ const Dashboard = () => {
         </div>
         <div
           id="leadrow"
-          className="grid grid-cols-5 gap-2 w-full   bg-red-200 rounded-lg p-1"
+          className="grid grid-cols-5 gap-2 w-full   rounded-lg p-1"
         >
           <LeadCard />
           <LeadCard />
@@ -76,8 +77,12 @@ const Dashboard = () => {
         <div className="flex gap-2  ">
           <div
             id="leadrow"
-            className="grid grid-cols-3 gap-4 w-3/4 min-h-screen  bg-red-200 rounded-lg p-4 mt-4"
-          ></div>
+            className="grid  gap-4 w-3/4 min-h-screen  bg-red-200 rounded-lg shadow mt-4"
+          >
+            <Leads/>
+
+
+          </div>
           <div id="leadform" className="shadow w-1/4 rounded-lg  mt-4">
             <Leadform />
           </div>
