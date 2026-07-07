@@ -1,11 +1,27 @@
 import React from "react";
+import { useEffect } from "react";
+// import { useState } from "react";  
+import axios from "axios";
 import Leadform from "./Leadform";
 import LeadCard from "./LeadCard";
 import Leads from "./Leads";
 import { IoMdNotifications } from "react-icons/io";
 import { FaAngleDown } from "react-icons/fa6";
+
 import { useState } from "react";
 const Dashboard = () => {
+///Api call to fetch leads data
+const [leads, setLeads] = useState([])
+ useEffect(() => {
+  const fetchLeads = async () => {
+  const response = await axios.get("https://jsonplaceholder.typicode.com/users");
+  setLeads(response.data);
+  // console.log(response.data);
+  };
+  fetchLeads();
+ },[]);
+
+
   const [open, setOpen] = useState(false);
   return (
     <div className="flex w-full p-1 m-1 max-w-auto  ṃin-h-screen">
@@ -79,12 +95,15 @@ const Dashboard = () => {
             id="leadrow"
             className="grid  gap-4 w-3/4 min-h-screen  bg-red-200 rounded-lg shadow mt-4"
           >
-            <Leads/>
+            <Leads leads={leads}/>
 
 
           </div>
           <div id="leadform" className="shadow w-1/4 rounded-lg  mt-4">
-            <Leadform />
+            <Leadform 
+            leads={leads}
+    setLeads={setLeads}
+    />
           </div>
         </div>
       </div>

@@ -1,38 +1,7 @@
+
 import { FaUserCircle, FaPen, FaTrash,} from "react-icons/fa";
 import { HiMiniPencilSquare } from "react-icons/hi2";
 import { RiDeleteBinLine } from "react-icons/ri";
-
-
-
-const leads = [
-  {
-    id: 1,
-    name: "Jane Cooper",
-    email: "jane.cooper@example.com",
-    phone: "(555) 123-4567",
-    company: "TechNova Inc.",
-    source: "Website",
-    status: "New",
-  },
-  {
-    id: 2,
-    name: "Floyd Miles",
-    email: "floyd.miles@example.com",
-    phone: "(555) 987-6543",
-    company: "Bright Solutions",
-    source: "Referral",
-    status: "Contacted",
-  },
-  {
-    id: 3,
-    name: "Kristin Watson",
-    email: "kristin@example.com",
-    phone: "(555) 456-7890",
-    company: "Innovatech",
-    source: "LinkedIn",
-    status: "Follow-up",
-  },
-];
 
 const statusColor = {
   New: "bg-blue-100 text-blue-600",
@@ -48,7 +17,10 @@ const sourceColor = {
   LinkedIn: "bg-purple-100 text-purple-600",
 };
 
-export default function LeadRow() {
+export default function LeadRow({ leads }) {
+ 
+
+
   return (
     <div className="bg-white rounded-xl mt-2 shadow overflow-hidden ">
 
@@ -81,24 +53,29 @@ export default function LeadRow() {
 
           <p className="text-gray-600 text-xs justify-center  flex-col  wrap-anywhere flex mx-1 text-center   ">{lead.phone}</p>
 
-          <p className="text-gray-600 text-xs p-2 text-center justify-center flex-col  wrap-anywhere flex ">{lead.company}</p>
+          <p className="text-gray-600 text-xs p-2 text-center justify-center flex-col  wrap-anywhere flex ">{lead.company.name}</p>
 
           <span
             className={`w-fit px-3 py-1 text-xs  rounded-full text-center flex justify-center mx-3 font-medium ${
-              sourceColor[lead.source]
+              sourceColor["website"]
             }`}
           >
-            {lead.source}
+        {lead.source || "Website"}
           </span>
+          {/* <span className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full">
+  Website
+</span> */}
 
           <span
             className={`w-20 px-3 py-1 text-xs  rounded-full text-center flex justify-center mx-3 font-medium ${
-              statusColor[lead.status]
-            }`}
+              statusColor["new"]
+}`}
           >
-            {lead.status}
+        {lead.status || "New"}
           </span>
-
+{/* <span className="bg-blue-100 text-blue-600 px-1 py-1 text-center rounded-full">
+  New
+</span> */}
           <div className="col-span-2 flex justify-center gap-5">
             <button className="text-blue-500 hover:text-blue-700 flex justify-center items-center">
               <HiMiniPencilSquare className="text-lg" />
