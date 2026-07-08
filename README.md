@@ -2,6 +2,9 @@
 
 A responsive Mini CRM built with React and Vite for managing customer leads in the browser. It fetches initial data from a public JSON API, stores it in localStorage, and supports add, edit, delete, search, and filter workflows on local data only.
 
+##Live Link
+link: https://mini-crm-customer-relationship-mana-theta.vercel.app/
+
 ## Features
 
 - Fetches initial lead data from `jsonplaceholder.typicode.com`
@@ -77,3 +80,4 @@ Add application screenshots here before submission.
 - Public API data is used read-only.
 - Lead changes are persisted only in the browser via `localStorage`.
 - The repository should include at least 7 meaningful commits before final submission.
+
