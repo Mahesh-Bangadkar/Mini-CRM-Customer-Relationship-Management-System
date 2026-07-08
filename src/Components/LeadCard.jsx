@@ -1,15 +1,16 @@
 import React from 'react'
-import { HiUserGroup } from 'react-icons/hi'
 
-const LeadCard = () => {
+const LeadCard = ({ title, value, Icon, iconClassName = "bg-blue-400 text-white" }) => {
+  const IconComponent = Icon;
+
   return (
-    <div>
-      <div className="bg-white w-50 h-25 rounded-xl p-5 shadow flex items-center">
-         <HiUserGroup className="text-5xl bg-blue-400 text-white p-1  rounded m-2 " /> 
-         <div className='flex flex-col m-2'>
-            <h1 className='font-lg text-gray-600'>Total Leads</h1>
-         <h1 className='font-semibold text-3xl text-gray-700' >10</h1>
-         </div>
+    <div className="rounded-xl bg-white p-3 shadow">
+      <div className="flex items-center gap-3">
+        <IconComponent className={`rounded p-1.5 text-3xl ${iconClassName}`} /> 
+        <div className='flex flex-col'>
+          <h1 className='text-sm font-medium text-gray-600'>{title}</h1>
+          <h1 className='text-2xl font-semibold text-gray-700'>{value}</h1>
+        </div>
       </div>
     </div>
   )

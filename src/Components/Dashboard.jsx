@@ -1,111 +1,164 @@
-import React from "react";
-import { useEffect } from "react";
-// import { useState } from "react";  
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Leadform from "./Leadform";
-import LeadCard from "./LeadCard";
 import Leads from "./Leads";
-import { IoMdNotifications } from "react-icons/io";
-import { FaAngleDown } from "react-icons/fa6";
+import DashboardHeader from "./DashboardHeader";
+import DashboardStats from "./DashboardStats";
+import EditLeadModal from "./EditLeadModal";
 
-import { useState } from "react";
-const Dashboard = () => {
-///Api call to fetch leads data
-const [leads, setLeads] = useState([])
- useEffect(() => {
-  const fetchLeads = async () => {
-  const response = await axios.get("https://jsonplaceholder.typicode.com/users");
-  setLeads(response.data);
-  // console.log(response.data);
-  };
-  fetchLeads();
- },[]);
+const normalizeLead = (lead) => ({
+  ...lead,
+  company:
+    typeof lead.company === "string"
+      ? { name: lead.company }
+      : lead.company || { name: "" },
+});
 
+const getStoredLeads = () => {
+  try {
+    const savedLeads = localStorage.getItem("Leads");
 
+    return savedLeads ? JSON.parse(savedLeads).map(normalizeLead) : [];
+  } catch {
+    return [];
+  }
+};
+
+const Dashboard = ({ onOpenSidebar }) => {
+ 
+
+  const [leads, setLeads] = useState(getStoredLeads);
   const [open, setOpen] = useState(false);
+
+  // Edit Modal
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [selectedLead, setSelectedLead] = useState(null);
+
+  // =======================
+  // FETCH DATA
+  // =======================
+
+  const fetchLeads = async () => {
+    try {
+      const response = await axios.get(
+        "https://jsonplaceholder.typicode.com/users"
+      );
+
+      const formattedData = response.data.map((user) => ({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        company: { name: user.company.name },
+        source: "Website",
+        status: "New",
+        notes: "",
+      }));
+
+      setLeads(formattedData);
+
+      localStorage.setItem(
+        "Leads",
+        JSON.stringify(formattedData)
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    if (localStorage.getItem("Leads") === null) {
+      const timerId = window.setTimeout(() => {
+        void fetchLeads();
+      }, 0);
+
+      return () => window.clearTimeout(timerId);
+    }
+  }, []);
+
+  // =======================
+  // DELETE
+  // =======================
+
+  const handleDelete = (id) => {
+    const updatedLeads = leads.filter(
+      (lead) => lead.id !== id
+    );
+
+    setLeads(updatedLeads);
+
+    localStorage.setItem(
+      "Leads",
+      JSON.stringify(updatedLeads)
+    );
+  };
+
+  // =======================
+  // EDIT
+  // =======================
+
+  const handleEdit = (lead) => {
+    setSelectedLead(lead);
+    setIsEditOpen(true);
+  };
+
+  const handleCloseEdit = () => {
+    setIsEditOpen(false);
+    setSelectedLead(null);
+  };
+
   return (
-    <div className="flex w-full p-1 m-1 max-w-auto  ṃin-h-screen">
-      <div id="Dashboard" className="w-full bg-white rounded-xl shadow-lg p-2">
-        <div className="flex justify-between items-center ">
-          <div className="flex flex-col gap-1 p-2 mb-1 ">
-            <h2 className="text-2xl font-bold text-gray-800 ">Dashboard</h2>
-            <p className="text-gray-500 text-sm">
-              {" "}
-              Welcome Back! Here's What's happening with your leads today
-            </p>
-          </div>
-          <div className="w-3/12 flex justify-space-between space-x-11 gap-2 shadow rounded-lg p-2 items-center ">
-            <div className="bg-white justify-around flex items-center w-8 shadow h-8 gap-2 rounded-full p-1">
-              <IoMdNotifications className="text-xl " />
-            </div>
-            <div className="flex gap-2 items-center justify-center">
-              <div className="bg-white justify-around flex items-center gap-2 w-8 h-8 rounded-full border-1 border-gray-300">
-                <img
-                  src="https://images.unsplash.com/photo-1654110455429-cf322b40a906?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                  alt="User"
-                  className="w-8 h-8 rounded-full object-cover overflow-hidden zoom-effect position-relative"
-                />
-              </div>
-              <button className="flex gap-2 items-center justify-center">
-                <div className="flex flex-col justify-center items-start">
-                  <h1 className="text-sm font-semibold text-gray-700 overflow-hidden text-ellipsis whitespace-nowrap max-w-[100px]">
-                    Jimmy johne
-                  </h1>
-                  <p className="text-xs text-gray-500">Admin</p>
-                </div>
+    <div className="w-full p-2 sm:p-3 lg:flex-1">
+      <div className="w-full rounded-xl bg-white p-2.5 shadow-lg sm:p-3">
+        <DashboardHeader
+          open={open}
+          onToggleOpen={() => setOpen(!open)}
+          onOpenSidebar={onOpenSidebar}
+        />
 
-                <div className="relative inline-block">
-                  {/*Dropdown Button */}
-                  <FaAngleDown
-                    className="text-gray-500 cursor-pointer"
-                    onClick={() => setOpen(!open)}
-                  />
+        <DashboardStats leads={leads} />
 
-                  {/* Dropdown Menu */}
-                  {open && (
-                    <div className="absolute right-0 mt-2 w-44 bg-white rounded-lg shadow-lg border z-50 overflow-hidden">
-                      <button className="w-full text-left px-4 py-2 hover:bg-gray-100">
-                        Edit Profile
-                      </button>
-                      <button className="w-full text-left px-4 py-2 hover:bg-gray-100">
-                        Settings
-                      </button>
-                      <button className="w-full text-left px-4 py-2 hover:bg-gray-100 text-red-600">
-                        Sign Out
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </button>
-            </div>
+        {/* Table + Form */}
+
+        <div className="mt-3 grid gap-3 xl:grid-cols-[minmax(0,1fr)_300px]">
+
+          <div className="min-w-0">
+
+            <Leads
+              leads={leads}
+              handleDelete={handleDelete}
+              handleEdit={handleEdit}
+            />
+
           </div>
+
+          <div className="min-w-0 xl:sticky xl:top-3 xl:self-start">
+
+            <Leadform
+              leads={leads}
+              setLeads={setLeads}
+            />
+
+          </div>
+
         </div>
-        <div
-          id="leadrow"
-          className="grid grid-cols-5 gap-2 w-full   rounded-lg p-1"
-        >
-          <LeadCard />
-          <LeadCard />
-          <LeadCard />
-          <LeadCard />
-          <LeadCard />
-        </div>
-        <div className="flex gap-2  ">
-          <div
-            id="leadrow"
-            className="grid  gap-4 w-3/4 min-h-screen  bg-red-200 rounded-lg shadow mt-4"
-          >
-            <Leads leads={leads}/>
 
+        {/* ===================== */}
+        {/* EDIT MODAL */}
+        {/* ===================== */}
 
-          </div>
-          <div id="leadform" className="shadow w-1/4 rounded-lg  mt-4">
-            <Leadform 
+        <EditLeadModal isOpen={isEditOpen} onClose={handleCloseEdit}>
+          <Leadform
+            key={selectedLead?.id ?? "edit-lead"}
             leads={leads}
-    setLeads={setLeads}
-    />
-          </div>
-        </div>
+            setLeads={setLeads}
+            selectedLead={selectedLead}
+            setIsEditOpen={setIsEditOpen}
+            setSelectedLead={setSelectedLead}
+            isModal
+          />
+        </EditLeadModal>
+
       </div>
     </div>
   );

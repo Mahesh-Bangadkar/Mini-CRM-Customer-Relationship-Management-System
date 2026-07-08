@@ -1,30 +1,65 @@
 import React from "react";
 import { useState } from "react";
 import { IoIosAddCircle } from "react-icons/io";
-const Leadform = ({ leads, setLeads }) => {
-  const [name, setName] = useState("")
-  const [email, setEmail] = useState("")
-  const [phone, setPhone] = useState("")
-  const [company, setCompany] = useState({ name: "" })
-  const [source, setSource] = useState("")
-  const [status, setStatus] = useState("")
-  const [notes, setNotes] = useState("")
+const createLeadState = (lead) => ({
+  name: lead?.name || "",
+  email: lead?.email || "",
+  phone: lead?.phone || "",
+  company:
+    typeof lead?.company === "string"
+      ? { name: lead.company }
+      : lead?.company || { name: "" },
+  source: lead?.source || "",
+  status: lead?.status || "",
+  notes: lead?.notes || "",
+});
+
+const Leadform = ({ leads, setLeads, selectedLead, setIsEditOpen, setSelectedLead, isModal = false }) => {
+  const [name, setName] = useState(() => createLeadState(selectedLead).name)
+  const [email, setEmail] = useState(() => createLeadState(selectedLead).email)
+  const [phone, setPhone] = useState(() => createLeadState(selectedLead).phone)
+  const [company, setCompany] = useState(() => createLeadState(selectedLead).company)
+  const [source, setSource] = useState(() => createLeadState(selectedLead).source)
+  const [status, setStatus] = useState(() => createLeadState(selectedLead).status)
+  const [notes, setNotes] = useState(() => createLeadState(selectedLead).notes)
+
+
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const newLead = {
-        id: Date.now(),
-        name,
-        email,
-        phone,
-        company,
-        source,
-        status,
-        notes,
+    if (!e.currentTarget.checkValidity()) {
+      e.currentTarget.reportValidity();
+      return;
+    }
+
+    const leadData = {
+      name,
+      email,
+      phone,
+      company: { name: company.name.trim() },
+      source,
+      status,
+      notes,
     };
 
-    setLeads([...leads, newLead]);
+    const updatedLeads = selectedLead
+      ? leads.map((lead) =>
+          lead.id === selectedLead.id
+            ? { ...lead, ...leadData }
+            : lead
+        )
+      : [...leads, { id: Date.now(), ...leadData }];
+
+    setLeads(updatedLeads);
+    localStorage.setItem("Leads", JSON.stringify(updatedLeads));
+
+    if (selectedLead) {
+      setSelectedLead?.(null);
+      setIsEditOpen?.(false);
+    }
+
 
     setName("");
     setEmail("");
@@ -35,13 +70,21 @@ const Leadform = ({ leads, setLeads }) => {
     setNotes("");
 };
 
+  const isEditing = Boolean(selectedLead);
+
   return (
-    <div className="w-full max-w-auto bg-white rounded-lg  min-h-full shadow-lg p-6">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">
-        Add New Lead
+    <div className={isModal ? "w-full bg-white p-3 sm:p-4" : "w-full max-w-auto rounded-lg bg-white p-4 shadow-lg sm:p-5"}>
+      <h2 className="mb-1 text-xl font-bold text-gray-800">
+        {isEditing ? "Edit Lead" : "Add New Lead"}
       </h2>
 
-      <form className="space-y-4" onSubmit={handleSubmit}>
+      <p className="mb-4 text-xs text-gray-500 sm:text-sm">
+        {isEditing
+          ? "Update the lead information below and save the changes."
+          : "Fill in the details below to create a new lead."}
+      </p>
+
+      <form className="space-y-3" onSubmit={handleSubmit}>
       
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -52,7 +95,7 @@ const Leadform = ({ leads, setLeads }) => {
             placeholder="Enter lead name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
         </div>
@@ -67,7 +110,7 @@ const Leadform = ({ leads, setLeads }) => {
             placeholder="Enter email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
         </div>
@@ -79,10 +122,13 @@ const Leadform = ({ leads, setLeads }) => {
           </label>
           <input
             type="tel"
+            inputMode="numeric"
+            pattern="[0-9]{10}"
+            maxLength={10}
             placeholder="Enter phone number"
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
         </div>
@@ -97,7 +143,7 @@ const Leadform = ({ leads, setLeads }) => {
             placeholder="Enter company name"
             value={company.name}
             onChange={(e) => setCompany({ ...company, name: e.target.value })}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
         </div>
@@ -108,7 +154,7 @@ const Leadform = ({ leads, setLeads }) => {
             Lead Source <span className="text-red-500">*</span>
           </label>
           <select
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
             value={source}
             onChange={(e) => setSource(e.target.value)}
@@ -117,9 +163,6 @@ const Leadform = ({ leads, setLeads }) => {
             <option>Website</option>
             <option>Referral</option>
             <option>LinkedIn</option>
-            <option>Facebook</option>
-            <option>Instagram</option>
-            <option>Cold Call</option>
             <option>Other</option>
           </select>
         </div>
@@ -138,9 +181,8 @@ const Leadform = ({ leads, setLeads }) => {
             <option value="">Select Status</option>
             <option>New</option>
             <option>Contacted</option>
-            <option>Qualified</option>
-            <option>Proposal Sent</option>
-            <option>Won</option>
+            <option>Follow-up</option>
+            <option>Converted</option>
             <option>Lost</option>
           </select>
         </div>
@@ -154,16 +196,16 @@ const Leadform = ({ leads, setLeads }) => {
             placeholder="Enter notes..."
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full resize-none rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           ></textarea>
         </div>
 
         <button
           type="submit"
-          className="w-full bg-blue-600 justify-center flex items-center text-white  rounded-lg hover:bg-blue-700 transition duration-200 font-medium"
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-slate-900 px-4 py-2.5 text-sm text-white shadow-lg shadow-slate-900/15 transition hover:bg-slate-800"
         >
-          <IoIosAddCircle className="inline-block m-2 text-2xl" />
-        <h1 >  Add Lead</h1>
+          <IoIosAddCircle className="text-xl" />
+          <span className="font-semibold">{selectedLead ? "Update Lead" : "Add Lead"}</span>
         </button>
       </form>
     </div>

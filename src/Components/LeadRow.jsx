@@ -3,29 +3,54 @@ import { FaUserCircle, FaPen, FaTrash,} from "react-icons/fa";
 import { HiMiniPencilSquare } from "react-icons/hi2";
 import { RiDeleteBinLine } from "react-icons/ri";
 
-const statusColor = {
-  New: "bg-blue-100 text-blue-600",
-  Contacted: "bg-yellow-100 text-yellow-700",
-  "Follow-up": "bg-orange-100 text-orange-600",
-  Converted: "bg-green-100 text-green-600",
-  Lost: "bg-red-100 text-red-600",
-};
-
-const sourceColor = {
-  Website: "bg-blue-100 text-blue-600",
-  Referral: "bg-green-100 text-green-600",
-  LinkedIn: "bg-purple-100 text-purple-600",
-};
-
-export default function LeadRow({ leads }) {
- 
-
-
+export default function LeadRow({ leads, handleDelete,handleEdit }) {
+  
   return (
-    <div className="bg-white rounded-xl mt-2 shadow overflow-hidden ">
+    <div className="mt-2 overflow-hidden rounded-xl bg-white shadow">
+
+      <div className="space-y-2.5 md:hidden">
+        {leads.map((lead) => (
+          <div key={lead.id} className="rounded-xl border border-gray-200 p-3 shadow-sm">
+            <div className="flex items-start justify-between gap-2.5">
+              <div>
+                <p className="text-sm font-semibold text-gray-900">{lead.name}</p>
+                <p className="mt-1 text-xs text-gray-500">{lead.company?.name || lead.company || ""}</p>
+              </div>
+
+              <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-medium text-slate-700">
+                {lead.status || "New"}
+              </span>
+            </div>
+
+            <div className="mt-2.5 space-y-1.5 text-sm text-gray-600">
+              <p className="break-all">{lead.email}</p>
+              <p>{lead.phone}</p>
+              <p>{lead.source || "Website"}</p>
+            </div>
+
+            <div className="mt-3 flex gap-2">
+              <button
+                className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-blue-50 px-3 py-2 text-xs font-medium text-blue-600"
+                onClick={() => handleEdit(lead)}
+              >
+                <HiMiniPencilSquare className="text-base" />
+                Edit
+              </button>
+
+              <button
+                className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-red-50 px-3 py-2 text-xs font-medium text-red-600"
+                onClick={() => handleDelete(lead.id)}
+              >
+                <RiDeleteBinLine className="text-base" />
+                Delete
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
 
       {/* Header */}
-      <div className="grid grid-cols-8 items-center px-2 py-2 bg-white justify-between flex-2  font-semibold text-gray-600 border-b-1 border-gray-200">
+      <div className="hidden grid-cols-8 items-center border-b border-gray-200 bg-white px-2 py-2 text-sm font-semibold text-gray-600 md:grid">
         <p className="items-center justify-center text-justify flex-col flex">Lead Name</p>
         <p className="items-center justify-center text-justify flex-col flex">Email</p>
         <p className="items-center justify-center text-justify flex-col flex">Phone</p>
@@ -36,57 +61,57 @@ export default function LeadRow({ leads }) {
       </div>
 
       {/* Rows */}
+      <div className="hidden md:block">
       {leads.map((lead) => (
         <div
           key={lead.id}
-          className="grid grid-cols-8 items-center px-2 py-4 border-b-1 border-gray-200 hover:bg-gray-50 transition"
+          className="grid grid-cols-8 items-center border-b border-gray-200 px-2 py-3 transition hover:bg-gray-50"
         >
           {/* Profile */}
           <div className="flex items-center p-2">
             {/* <FaUserCircle className="text-4xl text-gray-400" /> */}
-            <span className="font-semibold text-sm">{lead.name}</span>
+            <span className="text-sm font-semibold">{lead.name}</span>
           </div>
 
-          <p className="text-gray-600 text-xs flex items-center justify-center text-justify flex-col  wrap-anywhere">
+          <p className="flex items-center justify-center text-justify text-xs text-gray-600 flex-col wrap-anywhere">
             {lead.email}
           </p>
 
-          <p className="text-gray-600 text-xs justify-center  flex-col  wrap-anywhere flex mx-1 text-center   ">{lead.phone}</p>
+          <p className="mx-1 flex flex-col justify-center text-center text-xs text-gray-600 wrap-anywhere">{lead.phone}</p>
 
-          <p className="text-gray-600 text-xs p-2 text-center justify-center flex-col  wrap-anywhere flex ">{lead.company.name}</p>
+          <p className="flex flex-col justify-center p-1.5 text-center text-xs text-gray-600 wrap-anywhere">{lead.company?.name || lead.company || ""}</p>
 
           <span
-            className={`w-fit px-3 py-1 text-xs  rounded-full text-center flex justify-center mx-3 font-medium ${
-              sourceColor["website"]
-            }`}
+            className={`mx-2 flex w-fit justify-center rounded-full px-2.5 py-1 text-[11px] font-medium text-center `}
           >
         {lead.source || "Website"}
           </span>
-          {/* <span className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full">
-  Website
-</span> */}
+          
 
           <span
-            className={`w-20 px-3 py-1 text-xs  rounded-full text-center flex justify-center mx-3 font-medium ${
-              statusColor["new"]
-}`}
+            className={`mx-2 flex w-20 justify-center rounded-full px-2.5 py-1 text-[11px] font-medium text-center  `}
           >
         {lead.status || "New"}
           </span>
-{/* <span className="bg-blue-100 text-blue-600 px-1 py-1 text-center rounded-full">
-  New
-</span> */}
-          <div className="col-span-2 flex justify-center gap-5">
-            <button className="text-blue-500 hover:text-blue-700 flex justify-center items-center">
-              <HiMiniPencilSquare className="text-lg" />
+
+          <div className="col-span-2 flex justify-center gap-3 text-sm">
+            <button className="flex items-center justify-center text-blue-500 hover:text-blue-700"
+            onClick={()=>{
+              handleEdit(lead)
+            }}
+            >
+              <HiMiniPencilSquare className="text-base" />
               Edit
             </button>
-            <button className= "flex  justify-center items-center text-red-600 hover:text-red-700">
-              <RiDeleteBinLine className="text-lg" /> Delete
+            <button className= "flex items-center justify-center text-red-600 hover:text-red-700"  onClick={()=>{
+                handleDelete(lead.id)
+              }}>
+              <RiDeleteBinLine className="text-base"/> Delete
             </button>
           </div>
         </div>
       ))}
+      </div>
     </div>
   );
 }
